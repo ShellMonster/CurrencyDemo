@@ -104,8 +104,6 @@
 				EA2C7A011C97F25F001089F6 /* Data Model */,
 				EA2C79ED1C97F02F001089F6 /* AppDelegate.h */,
 				EA2C79EE1C97F02F001089F6 /* AppDelegate.m */,
-				EA2C79F01C97F02F001089F6 /* ViewController.h */,
-				EA2C79F11C97F02F001089F6 /* ViewController.m */,
 				EA2C79F31C97F02F001089F6 /* Main.storyboard */,
 				EA2C79F61C97F02F001089F6 /* Assets.xcassets */,
 				EA2C79F81C97F02F001089F6 /* LaunchScreen.storyboard */,
@@ -143,6 +141,8 @@
 				EA2C7A0F1C98610A001089F6 /* MyChoiceViewController.m */,
 				EA2C7A111C99351C001089F6 /* AllCurrencyViewController.h */,
 				EA2C7A121C99351C001089F6 /* AllCurrencyViewController.m */,
+				EA2C79F01C97F02F001089F6 /* ViewController.h */,
+				EA2C79F11C97F02F001089F6 /* ViewController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";

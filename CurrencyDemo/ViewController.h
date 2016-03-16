@@ -10,6 +10,7 @@
 
 @interface ViewController : UIViewController
 
+- (IBAction)segmentChange:(id)sender;
 
 @end
 

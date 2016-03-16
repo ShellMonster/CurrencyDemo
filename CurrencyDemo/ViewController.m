@@ -10,7 +10,16 @@
 
 #import "DataModel.h"
 
+#import "MyChoiceViewController.h"
+#import "AllCurrencyViewController.h"
+
+#define kMyChoiceViewController 0
+#define kAllCurrencyViewController 1
+
 @interface ViewController ()
+
+@property (strong, nonatomic) NSMutableArray *controllersArray;
+@property (assign, nonatomic) NSInteger currentView;
 
 @end
 
@@ -19,19 +28,54 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notictTest) name:@"DataDone" object:nil];
+    // 存放controllers的数组
+    _controllersArray = [[NSMutableArray alloc] initWithCapacity:10];
     
-    DataModel *model = [DataModel sharedInstance];
-    [model startFetchData];
-}
-
-- (void)notictTest {
-    NSLog(@"All data done!");
+    // 使用storyboard初始化VC
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    MyChoiceViewController *myChoiceVC = [storyboard instantiateViewControllerWithIdentifier:@"MyChoiceViewController"];
+    [_controllersArray addObject:myChoiceVC];
+    [self addChildViewController:myChoiceVC];
+    [self.view addSubview:myChoiceVC.view];
+    [myChoiceVC didMoveToParentViewController:self];
+    
+    AllCurrencyViewController *allVC = [storyboard instantiateViewControllerWithIdentifier:@"AllCurrencyViewController"];
+    [_controllersArray addObject:allVC];
+    
+    // 默认View为自选
+    _currentView = kMyChoiceViewController;
+    
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+// 切换View
+- (void)segmentChange:(id)sender {
+    
+    UITableViewController *currentVC = [_controllersArray objectAtIndex:_currentView];
+    
+    UITableViewController *toVC = nil;
+    
+    UISegmentedControl *segment = sender;
+    NSInteger selectedView = segment.selectedSegmentIndex;
+    
+    if (selectedView == kMyChoiceViewController) {
+        toVC = [_controllersArray objectAtIndex:kMyChoiceViewController];
+    } else {
+        toVC = [_controllersArray objectAtIndex:kAllCurrencyViewController];
+    }
+    
+    [currentVC willMoveToParentViewController:nil];
+    [self addChildViewController:toVC];
+    [self.view addSubview:toVC.view];
+    [toVC didMoveToParentViewController:self];
+    [currentVC.view removeFromSuperview];
+    [currentVC removeFromParentViewController];
+    
+    _currentView = selectedView;
 }
 
 - (void)dealloc {

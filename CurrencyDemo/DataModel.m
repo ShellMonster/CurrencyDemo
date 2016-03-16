@@ -27,8 +27,29 @@
 - (instancetype)init {
     if (self = [super init]) {
         _displayArray = [[NSMutableArray alloc] initWithCapacity:200];
+        [self initLocalData];
     }
     return self;
+}
+
+- (void)initLocalData {
+    // 初始化本地数据
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"Names" ofType:@"json"];
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    NSDictionary *namesDic = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    NSArray *tempArray = [[NSArray alloc] initWithArray:[namesDic allKeys] copyItems:YES];
+    _namesArray = [tempArray sortedArrayWithOptions:NSSortConcurrent usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [obj1 compare:obj2];
+    }];
+    
+    _fullNamesArray = [[NSMutableArray alloc] initWithCapacity:200];
+    _chineseNamesArray = [[NSMutableArray alloc] initWithCapacity:200];
+    
+    for (NSString *name in _namesArray) {
+        NSArray *array = namesDic[name];
+        [_fullNamesArray addObject:array[0]];
+        [_chineseNamesArray addObject:array[1]];
+    }
 }
 
 - (void)startFetchData {
@@ -53,23 +74,23 @@
 - (void)manageData:(NSDictionary *)dic {
     self.resources = [[Resources alloc] initWithDictionary:dic error:nil];
     
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"Names" ofType:@"json"];
-    NSData *data = [NSData dataWithContentsOfFile:path];
-    NSDictionary *namesDic = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    
+    // 设置货币中文名称和英文全称
     for (Currency *tempCurrency in self.resources.currencyArray) {
         NSRange range = NSMakeRange(0, 3);
         NSString *name = [tempCurrency.name substringWithRange:range];
         tempCurrency.name = name;
         
-        NSArray *array = namesDic[tempCurrency.name];
-        tempCurrency.fullName = array[0];
-        tempCurrency.chineseName = array[1];
+        NSUInteger index = [_namesArray indexOfObject:name];
+        if (index != NSNotFound) {
+            tempCurrency.fullName = _fullNamesArray[index];
+            tempCurrency.chineseName = _chineseNamesArray[index];
+        }
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"DataDone" object:nil userInfo:nil];
 }
 
+// 添加自选货币，name是货币缩写
 - (void)addDisplayCurrencyName:(NSString *)name {
     // 防止多线程重复添加
     @synchronized(self) {
@@ -77,8 +98,13 @@
             [_displayArray addObject:name];
         }
     }
+    NSDictionary *userInfo = @{
+                               @"name": name,
+                               };
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"Add" object:nil userInfo:userInfo];
 }
 
+// 删除自选货币，name是货币缩写
 - (void)removeDisplayCurrencyName:(NSString *)name {
     // 防止多线程多次删除
     @synchronized(self) {
@@ -86,6 +112,10 @@
             [_displayArray removeObject:name];
         }
     }
+    NSDictionary *userInfo = @{
+                               @"name": name,
+                               };
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"Remove" object:nil userInfo:userInfo];
 }
 
 @end

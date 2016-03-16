@@ -14,7 +14,11 @@
 @interface DataModel : NSObject
 
 @property (strong, nonatomic) Resources *resources;
-@property (strong, nonatomic) NSMutableArray *displayArray;
+@property (strong, nonatomic, readonly) NSMutableArray *displayArray;
+
+@property (strong, nonatomic, readonly) NSArray *namesArray;
+@property (strong, nonatomic, readonly) NSMutableArray *fullNamesArray;
+@property (strong, nonatomic, readonly) NSMutableArray *chineseNamesArray;
 
 + (id)sharedInstance;
 

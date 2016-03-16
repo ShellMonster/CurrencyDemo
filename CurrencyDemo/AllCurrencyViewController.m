@@ -13,8 +13,10 @@
 @interface AllCurrencyViewController ()
 
 @property (strong, nonatomic) NSArray *namesArray;
-@property (strong, nonatomic) NSMutableArray *fullNamesArray;
-@property (strong, nonatomic) NSMutableArray *chineseNamesArray;
+@property (strong, nonatomic) NSArray *fullNamesArray;
+@property (strong, nonatomic) NSArray *chineseNamesArray;
+
+@property (strong, nonatomic) DataModel *dataModel;
 
 @end
 
@@ -23,23 +25,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // 初始化本地数据
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"Names" ofType:@"json"];
-    NSData *data = [NSData dataWithContentsOfFile:path];
-    NSDictionary *namesDic = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    NSArray *tempArray = [[NSArray alloc] initWithArray:[namesDic allKeys] copyItems:YES];
-    _namesArray = [tempArray sortedArrayWithOptions:NSSortConcurrent usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        return [obj1 compare:obj2];
-    }];
+    // DataModel单例
+    _dataModel = [DataModel sharedInstance];
     
-    _fullNamesArray = [[NSMutableArray alloc] initWithCapacity:200];
-    _chineseNamesArray = [[NSMutableArray alloc] initWithCapacity:200];
+    // 初始化数组
+    _namesArray = [NSArray arrayWithArray:_dataModel.namesArray];
+    _fullNamesArray = [NSArray arrayWithArray:_dataModel.fullNamesArray];
+    _chineseNamesArray = [NSArray arrayWithArray:_dataModel.chineseNamesArray];
     
-    for (NSString *name in _namesArray) {
-        NSArray *array = namesDic[name];
-        [_fullNamesArray addObject:array[0]];
-        [_chineseNamesArray addObject:array[1]];
-    }
+    // 注册通知中心
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(displayCurrencyChangeWithUserInfo:) name:@"Remove" object:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -57,11 +52,13 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"AllCell" forIndexPath:indexPath];
     
     // 设置Cell属性
+    NSString *name = _namesArray[indexPath.row];
+    
     UIImageView *imageView = [cell viewWithTag:200];
-    [imageView setImage:[UIImage imageNamed:_namesArray[indexPath.row]]];
+    [imageView setImage:[UIImage imageNamed:name]];
     
     UILabel *nameLabel = [cell viewWithTag:201];
-    nameLabel.text = _namesArray[indexPath.row];
+    nameLabel.text = name;
     
     UILabel *chineseNameLabel = [cell viewWithTag:202];
     chineseNameLabel.text = _chineseNamesArray[indexPath.row];
@@ -69,11 +66,41 @@
     UILabel *fullNameLabel = [cell viewWithTag:203];
     fullNameLabel.text = _fullNamesArray[indexPath.row];
     
+    UIView *maskView = [cell viewWithTag:204];
+    if ([_dataModel.displayArray indexOfObject:name] != NSNotFound) {
+        maskView.alpha = 0.5;
+        cell.userInteractionEnabled = NO;
+    } else {
+        maskView.alpha = 0;
+        cell.userInteractionEnabled = YES;
+    }
+    
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    UIView *maskView = [cell viewWithTag:204];
+    maskView.alpha = 0.5;
+    cell.userInteractionEnabled = NO;
+    
+    NSString *displayCurrencyName = _namesArray[indexPath.row];
+    [_dataModel addDisplayCurrencyName:displayCurrencyName];
+}
+
+- (void)displayCurrencyChangeWithUserInfo:(NSDictionary *) userInfo {
+    NSString *name = userInfo[@"name"];
+    NSUInteger row = [_namesArray indexOfObject:name];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    UIView *maskView = [cell viewWithTag:204];
+    maskView.alpha = 0;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end
