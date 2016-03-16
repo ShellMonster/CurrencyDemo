@@ -28,6 +28,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    // 结合configureLayouts，让tableView不被遮挡
+    self.automaticallyAdjustsScrollViewInsets = NO;
     // 存放controllers的数组
     _controllersArray = [[NSMutableArray alloc] initWithCapacity:10];
     
@@ -38,6 +40,7 @@
     [self addChildViewController:myChoiceVC];
     [self.view addSubview:myChoiceVC.view];
     [myChoiceVC didMoveToParentViewController:self];
+    [self configureLayouts:myChoiceVC];
     
     AllCurrencyViewController *allVC = [storyboard instantiateViewControllerWithIdentifier:@"AllCurrencyViewController"];
     [_controllersArray addObject:allVC];
@@ -68,18 +71,29 @@
         toVC = [_controllersArray objectAtIndex:kAllCurrencyViewController];
     }
     
-    [currentVC willMoveToParentViewController:nil];
     [self addChildViewController:toVC];
     [self.view addSubview:toVC.view];
     [toVC didMoveToParentViewController:self];
+    [self configureLayouts:toVC];
+    [currentVC willMoveToParentViewController:nil];
     [currentVC.view removeFromSuperview];
     [currentVC removeFromParentViewController];
     
     _currentView = selectedView;
 }
 
+// 设置布局
+- (void)configureLayouts:(UIViewController *)viewController {
+    NSDictionary *dic = @{
+                          @"view": viewController.view,
+                          };
+    [viewController.view setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-64-[view]-0-|" options:0 metrics:nil views:dic]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[view]-0-|" options:0 metrics:nil views:dic]];
+}
+
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
 }
 
 @end

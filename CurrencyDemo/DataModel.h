@@ -13,7 +13,7 @@
 
 @interface DataModel : NSObject
 
-@property (strong, nonatomic) Resources *resources;
+@property (strong, nonatomic, readonly) NSMutableDictionary *allCurrencyDic;
 @property (strong, nonatomic, readonly) NSMutableArray *displayArray;
 
 @property (strong, nonatomic, readonly) NSArray *namesArray;

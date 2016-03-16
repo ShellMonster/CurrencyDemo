@@ -27,6 +27,7 @@
 - (instancetype)init {
     if (self = [super init]) {
         _displayArray = [[NSMutableArray alloc] initWithCapacity:200];
+        _allCurrencyDic = [[NSMutableDictionary alloc] initWithCapacity:200];
         [self initLocalData];
     }
     return self;
@@ -72,10 +73,10 @@
 }
 
 - (void)manageData:(NSDictionary *)dic {
-    self.resources = [[Resources alloc] initWithDictionary:dic error:nil];
+    Resources *resources = [[Resources alloc] initWithDictionary:dic error:nil];
     
     // 设置货币中文名称和英文全称
-    for (Currency *tempCurrency in self.resources.currencyArray) {
+    for (Currency *tempCurrency in resources.currencyArray) {
         NSRange range = NSMakeRange(0, 3);
         NSString *name = [tempCurrency.name substringWithRange:range];
         tempCurrency.name = name;
@@ -85,6 +86,8 @@
             tempCurrency.fullName = _fullNamesArray[index];
             tempCurrency.chineseName = _chineseNamesArray[index];
         }
+        
+        [_allCurrencyDic setObject:tempCurrency forKey:name];
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"DataDone" object:nil userInfo:nil];
