@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 
+#import "DataModel.h"
+
 @interface AppDelegate ()
 
 @end
@@ -17,6 +19,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+//    [[AFNetworkActivityIndicatorManager sharedManager] setEnabled:YES];
+    
+    DataModel *dataModel = [DataModel sharedInstance];
+    [dataModel startFetchData];
+    
     return YES;
 }
 

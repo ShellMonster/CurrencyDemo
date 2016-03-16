@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 
+#import "DataModel.h"
+
 @interface ViewController ()
 
 @end
@@ -17,6 +19,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notictTest) name:@"DataDone" object:nil];
+    
+    DataModel *model = [DataModel sharedInstance];
+    [model startFetchData];
+}
+
+- (void)notictTest {
+    NSLog(@"All data done!");
 }
 
 - (void)didReceiveMemoryWarning {
@@ -24,4 +34,18 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 @end
+
+
+
+
+
+
+
+
+
+
