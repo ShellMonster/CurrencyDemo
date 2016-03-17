@@ -13,6 +13,10 @@
 
 #import <AFNetworking.h>
 
+@interface DataModel ()
+
+@end
+
 @implementation DataModel
 
 + (id)sharedInstance {
@@ -28,9 +32,35 @@
     if (self = [super init]) {
         _displayArray = [[NSMutableArray alloc] initWithCapacity:200];
         _allCurrencyDic = [[NSMutableDictionary alloc] initWithCapacity:200];
+        [self loadDisplay];
         [self initLocalData];
     }
     return self;
+}
+
+// 读取文件
+- (void)loadDisplay {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *path = paths[0];
+    NSString *filePath = [path stringByAppendingPathComponent:@"Data.plist"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        NSData *data = [[NSData alloc] initWithContentsOfFile:filePath];
+        NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
+        _displayArray = [unarchiver decodeObjectForKey:@"displayArray"];
+        [unarchiver finishDecoding];
+    }
+}
+
+// 保存文件
+- (void)saveDisplay {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *path = paths[0];
+    NSString *filePath = [path stringByAppendingPathComponent:@"Data.plist"];
+    NSMutableData *data = [[NSMutableData alloc] initWithCapacity:300];
+    NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
+    [archiver encodeObject:_displayArray forKey:@"displayArray"];
+    [archiver finishEncoding];
+    [data writeToFile:filePath atomically:YES];
 }
 
 - (void)initLocalData {
@@ -101,10 +131,9 @@
             [_displayArray addObject:name];
         }
     }
-    NSDictionary *userInfo = @{
-                               @"name": name,
-                               };
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"Add" object:nil userInfo:userInfo];
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:name forKey:@"name"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"Add" object:self userInfo:userInfo];
+    [self saveDisplay];
 }
 
 // 删除自选货币，name是货币缩写
@@ -115,10 +144,9 @@
             [_displayArray removeObject:name];
         }
     }
-    NSDictionary *userInfo = @{
-                               @"name": name,
-                               };
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"Remove" object:nil userInfo:userInfo];
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:name forKey:@"name"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"Remove" object:self userInfo:userInfo];
+    [self saveDisplay];
 }
 
 @end

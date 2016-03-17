@@ -34,7 +34,7 @@
     _chineseNamesArray = [NSArray arrayWithArray:_dataModel.chineseNamesArray];
     
     // 注册通知中心
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(displayCurrencyChangeWithUserInfo:) name:@"Remove" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(displayCurrencyChangeWithNotice:) name:@"Remove" object:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -90,13 +90,15 @@
     [_dataModel addDisplayCurrencyName:displayCurrencyName];
 }
 
-- (void)displayCurrencyChangeWithUserInfo:(NSDictionary *) userInfo {
-    NSString *name = userInfo[@"name"];
+- (void)displayCurrencyChangeWithNotice:(NSNotification *) notice {
+    NSDictionary *userInfo = notice.userInfo;
+    NSString *name = [userInfo objectForKey:@"name"];
     NSUInteger row = [_namesArray indexOfObject:name];
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
     UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
     UIView *maskView = [cell viewWithTag:204];
     maskView.alpha = 0;
+    cell.userInteractionEnabled = YES;
 }
 
 - (void)dealloc {

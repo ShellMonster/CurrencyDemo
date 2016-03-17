@@ -21,7 +21,8 @@
 @property (strong, nonatomic) NSArray *chineseNamesArray;
 
 @property (strong, nonatomic) UITapGestureRecognizer *tapGesture;
-@property (strong, nonatomic) NSMutableDictionary *textFieldDic;
+@property (strong, nonatomic) NSMutableDictionary *priceDic;
+@property (strong, nonatomic) UITextField *editingTextField;
 
 @property (assign, nonatomic) NSInteger editingRow;
 
@@ -42,8 +43,10 @@
     _chineseNamesArray = [NSArray arrayWithArray:_dataModel.chineseNamesArray];
     
     // 注册通知中心
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(displayCurrencyChangeWithUserInfo:) name:@"Add" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(displayCurrencyChangeWithNotice:) name:@"Add" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updatePrice) name:@"DataDone" object:nil];
     
+    //
     UIView *blankView = [[UIView alloc] init];
     self.tableView.tableFooterView = blankView;
     
@@ -53,17 +56,25 @@
     [self.view addGestureRecognizer:_tapGesture];
     _tapGesture.enabled = NO;
     
-    // 当前自选货币的textField
-    _textFieldDic = [[NSMutableDictionary alloc] initWithCapacity:200];
+    // 记录换算结果
+    _priceDic = [[NSMutableDictionary alloc] initWithCapacity:200];
+    for (NSString *name in _displayingArray) {
+        [_priceDic setObject:@"" forKey:name];
+    }
     
     // 默认没有任何在编辑
-    _editingRow = -1;
+    _editingRow = 0;
+    
     
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Table view data source
@@ -94,11 +105,15 @@
     UITextField *textField = [cell viewWithTag:104];
     Currency *currency = [_dataModel.allCurrencyDic objectForKey:name];
     textField.placeholder = [NSString stringWithFormat:@"%.2lf", currency.price];
+    double amount = [[_priceDic objectForKey:name] doubleValue];
+    if (amount > 0.0) {
+        textField.text = [NSString stringWithFormat:@"%.2lf", amount];
+    } else {
+        textField.text = @"";
+    }
+    
     // 设置textField回调
     [textField addTarget:self action:@selector(textFieldDidChangeText:) forControlEvents:UIControlEventEditingChanged];
-    
-    // 保存textField
-    [_textFieldDic setObject:textField forKey:name];
     
     return cell;
 }
@@ -110,55 +125,96 @@
     UITextField *textField = [cell viewWithTag:104];
     textField.userInteractionEnabled = YES;
     [textField becomeFirstResponder];
+    _editingTextField = textField;
+    _editingTextField.delegate = self;
     _tapGesture.enabled = YES;
     
 }
 
+// 滑动删除
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        NSString *name = _displayingArray[indexPath.row];
+        [_dataModel removeDisplayCurrencyName:name];
+        [_priceDic removeObjectForKey:name];
+        _displayingArray = _dataModel.displayArray;
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationBottom];
+    }
+}
+
+#pragma mark - Gesture Methods
 - (void)singleTap:(UITapGestureRecognizer *) recognizer {
-    NSString *name = _displayingArray[_editingRow];
-    UITextField *textField = [_textFieldDic objectForKey:name];
-    [textField resignFirstResponder];
-    textField.userInteractionEnabled = NO;
+    [_editingTextField resignFirstResponder];
+    _editingTextField.userInteractionEnabled = NO;
     _tapGesture.enabled = NO;
 }
 
-- (void)displayCurrencyChangeWithUserInfo:(NSDictionary *) userInfo {
+#pragma mark - Notice Methods
+// Add
+- (void)displayCurrencyChangeWithNotice:(NSNotification *) notice {
     _displayingArray = _dataModel.displayArray;
+    NSDictionary *userInfo = notice.userInfo;
+    NSString *newCurrency = [userInfo objectForKey:@"name"];
+    [_priceDic setObject:@"" forKey:newCurrency];
     [self.tableView reloadData];
 }
 
+// DataDone
+- (void)updatePrice {
+    [self.tableView reloadData];
+}
+
+#pragma mark ------------------
 - (void)updatePriceFromCurrencyName:(NSString *) name {
-    UITextField *fromTextField = [_textFieldDic objectForKey:name];
     Currency *fromCurrency = [_dataModel.allCurrencyDic objectForKey:name];
     double fromPrice = fromCurrency.price;
-    double fromAmout = [fromTextField.text doubleValue];
+    double fromAmout = [_editingTextField.text doubleValue];
     
     // 储存所有textField对应的key
-    NSArray *array = [_textFieldDic allKeys];
+    NSArray *array = [_priceDic allKeys];
     for (NSString *toName in array) {
         if (![toName isEqualToString:name]) {
-            UITextField *toTextField = [_textFieldDic objectForKey:toName];
             Currency *toCurrency = [_dataModel.allCurrencyDic objectForKey:toName];
             double toPrice = toCurrency.price;
             double rate = toPrice / fromPrice;
             double toAmount = fromAmout * rate;
-            if (fromAmout > 0.0) {
-                [toTextField setText:[NSString stringWithFormat:@"%.2lf", toAmount]];
+            if (toAmount > 0.0) {
+                [_priceDic setObject:@(toAmount) forKey:toName];
             } else {
-                [toTextField setText:@""];
+                [_priceDic setObject:@"" forKey:toName];
+            }
+            NSInteger row = [_displayingArray indexOfObject:toName];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+            [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        } else {
+            if (fromAmout > 0.0) {
+                [_priceDic setObject:@(fromAmout) forKey:name];
+            } else {
+                [_priceDic setObject:@"" forKey:name];
             }
         }
     }
 }
 
-#pragma textField text change
+#pragma mark - textField text change
 - (void)textFieldDidChangeText:(UITextField *)textField {
     NSString *name = _displayingArray[_editingRow];
     [self updatePriceFromCurrencyName:name];
 }
 
-- (void)dealloc {
-    
+#pragma mark - UITextFieldDelegate Methods
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    NSString *editedText = textField.text;
+    double textValue = [editedText doubleValue];
+    if (textValue > 0.0) {
+        textField.text = [NSString stringWithFormat:@"%.2lf", textValue];
+    } else {
+        textField.text = @"";
+    }
 }
 
 @end

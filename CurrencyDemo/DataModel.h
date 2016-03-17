@@ -24,8 +24,15 @@
 
 + (id)sharedInstance;
 
+// 获取数据
 - (void)startFetchData;
+
+// 自选操作
 - (void)addDisplayCurrencyName:(NSString *)name;
 - (void)removeDisplayCurrencyName:(NSString *)name;
+
+// 文件处理
+- (void)saveDisplay;
+- (void)loadDisplay;
 
 @end
