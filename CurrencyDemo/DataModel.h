@@ -14,6 +14,8 @@
 @interface DataModel : NSObject
 
 @property (strong, nonatomic, readonly) NSMutableDictionary *allCurrencyDic;
+
+// displayArray用于存放自选货币的简写，NSString类型
 @property (strong, nonatomic, readonly) NSMutableArray *displayArray;
 
 @property (strong, nonatomic, readonly) NSArray *namesArray;
