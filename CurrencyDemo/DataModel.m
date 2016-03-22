@@ -88,6 +88,7 @@
     __weak typeof(self) weakSelf = self;
     
     AFHTTPSessionManager *session = [AFHTTPSessionManager manager];
+    session.requestSerializer.timeoutInterval = 7.0;
     [session GET:@"http://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=json"
       parameters:nil
         progress:nil

@@ -23,10 +23,6 @@
     // Override point for customization after application launch.
 //    [[AFNetworkActivityIndicatorManager sharedManager] setEnabled:YES];
     
-    _dataModel = [DataModel sharedInstance];
-    [_dataModel loadDisplay];
-    [_dataModel startFetchData];
-    
     return YES;
 }
 

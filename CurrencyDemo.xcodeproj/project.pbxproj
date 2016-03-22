@@ -20,6 +20,7 @@
 		EA2C7A0C1C97FB29001089F6 /* Names.json in Resources */ = {isa = PBXBuildFile; fileRef = EA2C7A0B1C97FB29001089F6 /* Names.json */; };
 		EA2C7A101C98610A001089F6 /* MyChoiceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2C7A0F1C98610A001089F6 /* MyChoiceViewController.m */; };
 		EA2C7A131C99351C001089F6 /* AllCurrencyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2C7A121C99351C001089F6 /* AllCurrencyViewController.m */; };
+		EA2C7A161C9BDE8A001089F6 /* HudView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2C7A151C9BDE8A001089F6 /* HudView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,8 @@
 		EA2C7A0F1C98610A001089F6 /* MyChoiceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyChoiceViewController.m; sourceTree = "<group>"; };
 		EA2C7A111C99351C001089F6 /* AllCurrencyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AllCurrencyViewController.h; sourceTree = "<group>"; };
 		EA2C7A121C99351C001089F6 /* AllCurrencyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AllCurrencyViewController.m; sourceTree = "<group>"; };
+		EA2C7A141C9BDE8A001089F6 /* HudView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HudView.h; sourceTree = "<group>"; };
+		EA2C7A151C9BDE8A001089F6 /* HudView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HudView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +112,8 @@
 				EA2C79F81C97F02F001089F6 /* LaunchScreen.storyboard */,
 				EA2C79FB1C97F02F001089F6 /* Info.plist */,
 				EA2C79EA1C97F02F001089F6 /* Supporting Files */,
+				EA2C7A141C9BDE8A001089F6 /* HudView.h */,
+				EA2C7A151C9BDE8A001089F6 /* HudView.m */,
 			);
 			path = CurrencyDemo;
 			sourceTree = "<group>";
@@ -262,6 +267,7 @@
 				EA2C7A071C97F2B9001089F6 /* Resources.m in Sources */,
 				EA2C79EF1C97F02F001089F6 /* AppDelegate.m in Sources */,
 				EA2C79EC1C97F02F001089F6 /* main.m in Sources */,
+				EA2C7A161C9BDE8A001089F6 /* HudView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
