@@ -25,6 +25,9 @@
 @property (strong, nonatomic) UITextField *editingTextField;
 
 @property (assign, nonatomic) NSInteger editingRow;
+//@property (assign, nonatomic) NSNumber *arrayCount;
+
+@property (strong, nonatomic) UIButton *addButton;
 
 @end
 
@@ -38,6 +41,8 @@
     
     // 自选数组
     _displayingArray = [[NSArray alloc] initWithArray:_dataModel.displayArray copyItems:NO];
+//    _arrayCount = [NSNumber numberWithInteger:_displayingArray.count];
+//    [self addObserver:self forKeyPath:@"arrayCount" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     
     _fullNamesArray = [NSArray arrayWithArray:_dataModel.fullNamesArray];
     _chineseNamesArray = [NSArray arrayWithArray:_dataModel.chineseNamesArray];
@@ -46,9 +51,12 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(displayCurrencyChangeWithNotice:) name:@"Add" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updatePrice) name:@"DataDone" object:nil];
     
-    //
-    UIView *blankView = [[UIView alloc] init];
-    self.tableView.tableFooterView = blankView;
+    // UI
+    _addButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+    _addButton.frame = CGRectMake(0, 0, screenWidth, 100);
+    [_addButton setTitle:@"添加自选" forState:UIControlStateNormal];
+    [_addButton setBackgroundColor:[UIColor yellowColor]];
     
     // 设置手势，点击其他地方收起键盘
     _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTap:)];
@@ -64,8 +72,6 @@
     
     // 默认没有任何在编辑
     _editingRow = 0;
-    
-    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -78,7 +84,6 @@
 }
 
 #pragma mark - Table view data source
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return _displayingArray.count;
 }
@@ -111,7 +116,6 @@
     } else {
         textField.text = @"";
     }
-    
     // 设置textField回调
     [textField addTarget:self action:@selector(textFieldDidChangeText:) forControlEvents:UIControlEventEditingChanged];
     
@@ -142,8 +146,14 @@
         [_dataModel removeDisplayCurrencyName:name];
         [_priceDic removeObjectForKey:name];
         _displayingArray = _dataModel.displayArray;
+//        _arrayCount = [NSNumber numberWithInteger:_displayingArray.count];
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationBottom];
     }
+}
+
+#pragma mark - KVO
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    NSLog(@"hhh");
 }
 
 #pragma mark - Gesture Methods
@@ -161,11 +171,13 @@
     NSString *newCurrency = [userInfo objectForKey:@"name"];
     [_priceDic setObject:@"" forKey:newCurrency];
     [self.tableView reloadData];
+//    _arrayCount = [NSNumber numberWithInteger:_displayingArray.count];
 }
 
 // DataDone
 - (void)updatePrice {
     [self.tableView reloadData];
+//    _arrayCount = [NSNumber numberWithInteger:_displayingArray.count];
 }
 
 #pragma mark ------------------

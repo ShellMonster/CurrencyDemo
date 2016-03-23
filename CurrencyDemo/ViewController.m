@@ -62,10 +62,13 @@
     [_dataModel loadDisplay];
     [_dataModel startFetchData];
     
-    // HudView，启动即运行
+    // 显示HudView
     [self showHudView];
+    
     // 接收通知，当数据获取完毕后隐藏hudView
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataDone) name:@"DataDone" object:nil];
+    // 超时
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataTimeOut) name:@"TimeOut" object:nil];
     
     // 刷新按钮
     _refreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -120,24 +123,42 @@
 
 // hudView
 - (void)showHudView {
-    _hudView = [[HudView alloc] initWithFrame:self.view.frame];
-    self.navigationController.view.userInteractionEnabled = NO;
-    [self.view addSubview:_hudView];
+    NSInteger count = _dataModel.displayArray.count;
+    if (count > 0) {
+        _hudView = [[HudView alloc] initWithFrame:self.view.frame];
+        self.navigationController.view.userInteractionEnabled = NO;
+        _refreshButton.enabled = NO;
+        [self.view addSubview:_hudView];
+    }
+
 }
 
 // 接收通知，当数据获取完毕后隐藏hudView
 - (void)dataDone {
-    [_hudView setHudViewImage:[UIImage imageNamed:@"checkmark"] text:@"Done"];
-    [_hudView setNeedsDisplay];
-    [_hudView dismissHudViewAfterDelay:0.7 completion:^{
-        self.navigationController.view.userInteractionEnabled = YES;
-        _refreshButton.enabled = YES;
-        _hudView = nil;
-    }];
+    if (_hudView != nil) {
+        [_hudView setHudViewImage:[UIImage imageNamed:@"checkmark"] text:@"Done"];
+        [_hudView setNeedsDisplay];
+        [_hudView dismissHudViewAfterDelay:0.7 completion:^{
+            self.navigationController.view.userInteractionEnabled = YES;
+            _refreshButton.enabled = YES;
+            _hudView = nil;
+        }];
+    }
+}
+
+- (void)dataTimeOut {
+    if (_hudView != nil) {
+        [_hudView setHudViewImage:[UIImage imageNamed:@"cross"] text:@"Time Out"];
+        [_hudView setNeedsDisplay];
+        [_hudView dismissHudViewAfterDelay:0.7 completion:^{
+            self.navigationController.view.userInteractionEnabled = YES;
+            _refreshButton.enabled = YES;
+            _hudView = nil;
+        }];
+    }
 }
 
 - (void)requestData {
-    _refreshButton.enabled = NO;
     [_dataModel startFetchData];
     [self showHudView];
 }

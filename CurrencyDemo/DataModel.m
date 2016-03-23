@@ -99,7 +99,8 @@
              [strongSelf manageData:dic];
              
          } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-             NSLog(@"%@", error);
+             NSLog(@"%@", error.localizedDescription);
+             [[NSNotificationCenter defaultCenter] postNotificationName:@"TimeOut" object:nil];
          }];
 }
 
