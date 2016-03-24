@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C878912BDCA29BFF6EF9B4DE /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E7079508B1AF64FDCF1C9775 /* libPods.a */; };
+		EA23904B1CA3CDE900508E71 /* ResultsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23904A1CA3CDE900508E71 /* ResultsTableViewController.m */; };
 		EA2C79EC1C97F02F001089F6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2C79EB1C97F02F001089F6 /* main.m */; };
 		EA2C79EF1C97F02F001089F6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2C79EE1C97F02F001089F6 /* AppDelegate.m */; };
 		EA2C79F21C97F02F001089F6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2C79F11C97F02F001089F6 /* ViewController.m */; };
@@ -27,6 +28,8 @@
 		38FB75621112CF12C7737592 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		514EDCC3CC4FF53BFD761B5C /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		E7079508B1AF64FDCF1C9775 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA2390491CA3CDE900508E71 /* ResultsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResultsTableViewController.h; sourceTree = "<group>"; };
+		EA23904A1CA3CDE900508E71 /* ResultsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResultsTableViewController.m; sourceTree = "<group>"; };
 		EA2C79E71C97F02F001089F6 /* CurrencyDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CurrencyDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA2C79EB1C97F02F001089F6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EA2C79ED1C97F02F001089F6 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -148,6 +151,8 @@
 				EA2C7A121C99351C001089F6 /* AllCurrencyViewController.m */,
 				EA2C79F01C97F02F001089F6 /* ViewController.h */,
 				EA2C79F11C97F02F001089F6 /* ViewController.m */,
+				EA2390491CA3CDE900508E71 /* ResultsTableViewController.h */,
+				EA23904A1CA3CDE900508E71 /* ResultsTableViewController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -263,6 +268,7 @@
 				EA2C7A131C99351C001089F6 /* AllCurrencyViewController.m in Sources */,
 				EA2C79F21C97F02F001089F6 /* ViewController.m in Sources */,
 				EA2C7A041C97F279001089F6 /* DataModel.m in Sources */,
+				EA23904B1CA3CDE900508E71 /* ResultsTableViewController.m in Sources */,
 				EA2C7A0A1C97F2C7001089F6 /* Currency.m in Sources */,
 				EA2C7A071C97F2B9001089F6 /* Resources.m in Sources */,
 				EA2C79EF1C97F02F001089F6 /* AppDelegate.m in Sources */,

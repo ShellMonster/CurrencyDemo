@@ -7,16 +7,21 @@
 //
 
 #import "AllCurrencyViewController.h"
+#import "ResultsTableViewController.h"
 
 #import "DataModel.h"
 
 @interface AllCurrencyViewController ()
+    <UISearchResultsUpdating>
 
 @property (strong, nonatomic) NSArray *namesArray;
 @property (strong, nonatomic) NSArray *fullNamesArray;
 @property (strong, nonatomic) NSArray *chineseNamesArray;
 
 @property (strong, nonatomic) DataModel *dataModel;
+
+@property (strong, nonatomic) UISearchController *searchController;
+@property (strong, nonatomic) ResultsTableViewController *resultsController;
 
 @end
 
@@ -35,11 +40,32 @@
     
     // 注册通知中心
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(displayCurrencyChangeWithNotice:) name:@"Remove" object:nil];
+    
+    // 搜索框
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    _resultsController = (ResultsTableViewController *)[storyboard instantiateViewControllerWithIdentifier:@"ResultsTableViewController"];
+    _searchController = [[UISearchController alloc] initWithSearchResultsController:_resultsController];
+    self.tableView.tableHeaderView = _searchController.searchBar;
+    _searchController.searchResultsUpdater = self;
+    self.definesPresentationContext = YES;
+    _searchController.hidesNavigationBarDuringPresentation = YES;
+    _searchController.dimsBackgroundDuringPresentation = YES;
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - update searching
+- (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    NSString *searchText = searchController.searchBar.text;
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF CONTAINS[cd] %@", searchText];
+    if (searchText != nil) {
+        [_resultsController.resultsArray removeAllObjects];
+    }
+    _resultsController.resultsArray = [NSMutableArray arrayWithArray:[_namesArray filteredArrayUsingPredicate:predicate]];
+    [_resultsController.tableView reloadData];
 }
 
 #pragma mark - Table view data source
